@@ -76,8 +76,8 @@ def construct_sgf(ogsdata):
   black_username = None
   white_username = None
   if players is not None:
-    black = get(players,"black",logifnone=True)
-    white = get(players,"white",logifnone=True)
+    black = get(players,"black",logifnone=True,game_id=game_id)
+    white = get(players,"white",logifnone=True,game_id=game_id)
     if black is not None and len(black) > 0:
       black_username = get(black,"username",logifnone=True,game_id=game_id)
       if black_username is not None:
@@ -121,35 +121,35 @@ def construct_sgf(ogsdata):
     if system is None:
       system = get(time_control,"system")
     if system is None:
-      system = get(time_control,"time_control",logifnone=True)
+      system = get(time_control,"time_control",logifnone=True,game_id=game_id)
 
     if system == "byoyomi":
-      main_time = get(time_control,"main_time",logifnone=True)
-      period_time = get(time_control,"period_time",logifnone=True)
-      periods = get(time_control,"periods",logifnone=True)
+      main_time = get(time_control,"main_time",logifnone=True,game_id=game_id)
+      period_time = get(time_control,"period_time",logifnone=True,game_id=game_id)
+      periods = get(time_control,"periods",logifnone=True,game_id=game_id)
       if main_time is not None and period_time is not None and periods is not None:
         out += param("TM",main_time)
         out += param("OT",f"{periods}x{period_time} byo-yomi")
     elif system == "fischer":
-      initial_time = get(time_control,"initial_time",logifnone=True)
-      time_increment = get(time_control,"time_increment",logifnone=True)
+      initial_time = get(time_control,"initial_time",logifnone=True,game_id=game_id)
+      time_increment = get(time_control,"time_increment",logifnone=True,game_id=game_id)
       if initial_time is not None and time_increment is not None:
         out += param("TM",initial_time)
         out += param("OT",f"{time_increment} fischer")
     elif system == "simple":
-      per_move = get(time_control,"per_move",logifnone=True)
+      per_move = get(time_control,"per_move",logifnone=True,game_id=game_id)
       if per_move is not None:
         out += param("TM",0)
         out += param("OT",f"{per_move} simple")
     elif system == "canadian":
-      main_time = get(time_control,"main_time",logifnone=True)
-      period_time = get(time_control,"period_time",logifnone=True)
-      stones_per_period = get(time_control,"stones_per_period",logifnone=True)
+      main_time = get(time_control,"main_time",logifnone=True,game_id=game_id)
+      period_time = get(time_control,"period_time",logifnone=True,game_id=game_id)
+      stones_per_period = get(time_control,"stones_per_period",logifnone=True,game_id=game_id)
       if main_time is not None and period_time is not None and stones_per_period is not None:
         out += param("TM",main_time)
         out += param("OT",f"{stones_per_period}/{period_time} canadian")
     elif system == "absolute":
-      total_time = get(time_control,"total_time",logifnone=True)
+      total_time = get(time_control,"total_time",logifnone=True,game_id=game_id)
       if total_time is not None:
         out += param("TM",total_time)
     elif system == "none":
@@ -262,8 +262,8 @@ def construct_sgf(ogsdata):
 
   initial_state = get(ogsdata,"initial_state")
   if initial_state is not None:
-    bstate = get(initial_state,"black",logifnone=True)
-    wstate = get(initial_state,"white",logifnone=True)
+    bstate = get(initial_state,"black",logifnone=True,game_id=game_id)
+    wstate = get(initial_state,"white",logifnone=True,game_id=game_id)
     if bstate is not None and len(bstate) > 0:
       out += "AB"
       for i in range(0, len(bstate), 2):
@@ -318,21 +318,18 @@ if __name__ == "__main__":
         outfile = filename[:-5]+".sgf"
         if args.verbose:
           logging.info(f"{filename} -> {outfile}")
-        with open(filename) as f:
+        with open(filename, encoding='UTF-8') as f:
           ogsdata = json.load(f)
         sgf = construct_sgf(ogsdata)
-        with open(outfile,"w") as f:
-          f.write(sgf)
+        with open(outfile,"w", encoding='UTF-8') as f:
+          try:
+            f.write(sgf[2])
+          except BaseException as err:
+            print("Exception raised at game_id", ogsdata['game_id'])
+            print(type(err), ":", err)
         num_processed += 1
         if num_processed % 10000 == 0:
           logging.info(f"Processed {num_processed} files")
 
   logging.info(f"Processed {num_processed} files")
   logging.info("Done")
-
-
-
-
-
-
-
