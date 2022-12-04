@@ -1,7 +1,7 @@
 # ogstosgf
 Tool for converting raw OGS game JSONs to SGFs, modified for use in [ogs-data-analysis-tools](https://github.com/gyu-eun-lee/ogs-data-analysis-tools).
 
-I made this to slightly tweak the output behavior from the original tool to better suit my needs.
+I made this to slightly tweak the output behavior from the [original tool](https://github.com/lightvector/ogstosgf) to better suit my needs.
 Not looking to merge at the moment because I'm not sure the new behavior is as originally intended.
 
 ## Usage:
